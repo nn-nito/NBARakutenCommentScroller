@@ -135,29 +135,46 @@
 
 	/** メイン処理 */
 	function main() {
-		document.body.addEventListener('DOMNodeInserted', function (e) {
-			if (e.target.className == 'pGamesDetail-video-chat slide-enter slide-enter-active') {
-				// 初回読み込みで多量にコメントを検知してしまうので初回はsetTimeout使用
-				window.setTimeout(function () {
-					$screen = $('#mainContainer');
-					$screen.css({
-						'white-space': 'nowrap',
-						'overflow': 'hidden',
-						'position': 'relative',
-					});
+		let ps = $('.pGamesDetail-video-container')[0];
+		if (!ps) {
+			window.setTimeout(function () {
+				if (retry--) main();
+			}, 100);
+			return;
+		}
 
-					updateStyle($screen.height() / MAX_LINE_COUNT);
+		const pObserver = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+				if (mutation.addedNodes.length == 0) return;
+				if (mutation.addedNodes[0].className == 'pGamesDetail-video-chat slide-enter slide-enter-active') {
+					// 初回読み込みで多量にコメントを検知してしまうので初回はsetTimeout使用
+					window.setTimeout(function () {
+						$screen = $('#mainContainer');
+						$screen.css({
+							'white-space': 'nowrap',
+							'overflow': 'hidden',
+							'position': 'relative',
+						});
 
-					var chatContainer = document.querySelector('.ChatList-container');
-					chatContainer.addEventListener('DOMNodeInserted', function (e) {
-						let comment = e.target;
-						if (comment.className != 'ChatCard') return;
-						let c = comment.querySelector('.bTypography__variant_body2');
-						$screen.comment(c.textContent);
-					});
-				}, 1000);
-			}
+						updateStyle($screen.height() / MAX_LINE_COUNT);
+
+						const chatContainer = document.querySelector('.ChatList-container');
+						const cObserver = new MutationObserver((mutations) => {
+							mutations.forEach((mutation) => {
+								if (mutation.addedNodes.length == 0) return;
+								let comment = mutation.addedNodes[0];
+								if (comment.className != 'ChatCard') return;
+								const text = comment.children[1].innerText;
+								$screen.comment(text);
+							});
+						});
+
+						cObserver.observe(chatContainer, { childList: true });
+					}, 1000);
+				}
+			});
 		});
+		pObserver.observe(ps, { childList: true });
 
 		$(window).resize(function () {
 			if ($screen.length === 0) return;
