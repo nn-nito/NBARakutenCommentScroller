@@ -3,11 +3,11 @@
 // @namespace   nn-nito
 // @description NBA楽天のライブ配信時のコメントをニコニコ風に流す
 // @include     https://nba.rakuten.co.jp/games/*
-// @version     1.0.2
+// @version     1.1.0
 // @grant       none
 // @noframes
 // @require https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/velocity/1.5.0/velocity.min.js
+// @require https://cdnjs.cloudflare.com/ajax/libs/move.js/0.5.0/move.min.js
 // ==/UserScript==
 
 (() => {
@@ -89,45 +89,17 @@
 			'top': cmHeight * index,
 			'left': this.width(),
 			'padding': '5px',
+			'pointer-events': 'none',
 		});
 		comment.show();
 
-		/** アニメーションライブラリ 色々試したけどパフォーマンスが一番いいのはVelocityぽい */
-
-		// TweenMax CSS
-		// https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js
-		// TweenMax.to(comment[0], time / 1000, {
-		// 	css: { left: (-comment.width()) + 'px' },
-		// 	onComplete: () => comment.remove(),
-		// 	ease: Linear.easeNone,
-		// });
-
-		// TweenMax Translate
-		// https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js
-		// TweenMax.to(comment[0], time / 1000, {
-		// 	x: -(this.width() + comment.width()),
-		// 	onComplete: () => comment.remove(),
-		// 	ease: Linear.easeNone,
-		// });
-
-		// Timeline
-		// https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TimelineMax.min.js
-		// var timeline = new TimelineMax({onComplete: () => comment.remove()});
-		// timeline.to(comment[0], time / 1000, { x: -(this.width() + comment.width()), ease: Linear.easeNone,});
-
-		// Velocity
-		// https://cdnjs.cloudflare.com/ajax/libs/velocity/1.5.0/velocity.min.js
-		comment.velocity(
-			{
-				translateX: -(this.width() + comment.width()) + 'px',
-			},
-			{
-				duration: time,
-				easing: 'linear',
-				complete: () => comment.remove(),
-			}
+		move(comment[0])
+        .to(-(this.width() + comment.width()))
+        .duration(time)
+		.ease('linear')
+        .end(
+			() => comment.remove()
 		);
-		/** */
 
 		// data属性設定
 		this.data(dataKey, data);
