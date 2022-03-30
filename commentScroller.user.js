@@ -3,7 +3,7 @@
 // @namespace   nn-nito
 // @description NBA楽天のライブ配信時のコメントをニコニコ風に流す
 // @include     https://nba.rakuten.co.jp/games/*
-// @version     1.1.1
+// @version     1.1.2
 // @grant       none
 // @noframes
 // @require https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js
@@ -142,7 +142,7 @@
 						});
 
 						cObserver.observe(chatContainer, { childList: true });
-					}, 6000);
+					}, 1000);
 				}
 			});
 		});
