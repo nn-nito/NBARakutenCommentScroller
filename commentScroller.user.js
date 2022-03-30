@@ -142,7 +142,7 @@
 						});
 
 						cObserver.observe(chatContainer, { childList: true });
-					}, 1000);
+					}, 6000);
 				}
 			});
 		});
